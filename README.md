@@ -2,7 +2,7 @@
 # Merlin Bread: A platform game I created for my Intro to CS class final project.
 
 All audio files must be downloaded onto the device that is trying to run this code.
-The audio file for the main background music (variable name: "music2") can be found here:
+The audio file for the main background music (variable name: music2) can be found here:
 https://drive.google.com/file/d/1MoqM1-o2OS-mgEgxGe74SVpQPvqGu-IC/view
 (NOTE: there have been some issues with using this audio file).
 
@@ -10,6 +10,8 @@ Time for each level is currently set at 30 seconds (variable name: how_long). I'
 and therefore more fun. the variable how_long is in this python file (once as global variable and once in the again function),
 so both instances of the variable would have to be changed in order to play at a new set time when first playing the game 
 and also when trying again.
+
+The code for this game references two imports: pygame and gamebox. Gamebox is a python file created by my professor, Luther Tychonievich, for the purposes of simplying the use of the pygame import.
 
 This project was completed with the guidance of Sean Gatewood (my class TA).
 
