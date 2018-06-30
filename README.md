@@ -21,7 +21,7 @@ These are some brainstorming notes from when I created the idea for the game (No
 
 game  idea:
 This will be a platform game. 
-Main Character: Merlin the Wizard
+Main Character: Merlin the Wizard.
 Story Plot: Merlin forgot to feed his dragon. Dragon is in dungeon.
 Merlin needs to collect enough pieces of gluten-free bread to keep dragon happy.
 
