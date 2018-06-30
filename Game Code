@@ -1,0 +1,473 @@
+# sg4wc & ram2ur
+import pygame
+import gamebox
+
+#Final Version of Video Game Project: Merlin Bread
+
+
+game_over = 0
+ticks = 0
+how_long = 30
+camera = gamebox.Camera(1000, 600)
+merlin = gamebox.from_image(50, 100, "merlin2.png")
+merlin.scale_by(.06)
+merlin_lives = 3
+life_recovery = 3
+bread_collected = 0
+level_counter = 1
+end_music = True
+baddies = gamebox.load_sprite_sheet("https://opengameart.org/sites/default/files/BODY_FEMALE_ORC_0.png",4, 9)
+#
+counter = 0
+show_splash = True
+a = ''
+
+music2=gamebox.load_sound("8-bit-music.wav")
+musicplayer2=music2.play(-1)
+
+def splash(keys):
+    global show_splash, ticks
+    camera.clear('Lightblue')
+    breadsplash = gamebox.from_image(500, 300,"bread_splashscreen.png")
+    breadsplash.scale_by(.28)
+    title = gamebox.from_text(camera.x, 200, "MerlinBread", "Arial", 100, 'black')
+
+    intro1 = gamebox.from_text(camera.x,camera.y, "Merlin needs to feed his pet dragon.", "Arial", 22, 'black')
+    intro1.top = title.bottom
+    #intro1.left = camera.left + 20
+
+    intro2 = gamebox.from_text(camera.x,camera.y, "Help him collect all 20 pieces of bread before time runs out.", "Arial", 22, 'black')
+    intro2.top = intro1.bottom
+
+    intro3 = gamebox.from_text(camera.x,camera.y, "Watch out for goblins along the way!","Arial", 22,'black')
+    intro3.top = intro2.bottom
+    controls = gamebox.from_text(camera.x, camera.y, "Use arrow keys to move and space to shoot goblins", "Arial", 28, 'black')
+    controls.top = intro3.bottom +5
+
+    next_screen = gamebox.from_text(camera.x, camera.y, "Press <SPACE> to Continue", "Arial", 40, 'black')
+    next_screen.bottom = camera.bottom -50
+
+
+    creators = gamebox.from_text(875, 500, "Sruthi - sg4wc and Adam - ram2ur", "Arial", 20, 'black')
+    creators.bottom = camera.bottom
+    creators.right = camera.right -10
+
+    camera.draw(breadsplash)
+    camera.draw(title)
+    camera.draw(intro1)
+    camera.draw(intro2)
+    camera.draw(intro3)
+    camera.draw(controls)
+    camera.draw(next_screen)
+    camera.draw(creators)
+    if pygame.K_SPACE in keys:
+        show_splash = False
+    camera.display()
+
+def again(keys):
+    global try_again, ticks, merlin_lives, life_recovery, breads, bread_collected, level_counter, counter, how_long, ticks, game_over, goblins, camera
+    camera.x = 500
+    camera.y = 300
+    camera.clear('Lightblue')
+    breadsplash = gamebox.from_image(camera.x, camera.y, "bread_splashscreen.png")
+    #camera.x = 500,camera.y = 300
+    breadsplash.scale_by(.28)
+
+    title = gamebox.from_text(camera.x, camera.y-120, "MerlinBread", "Arial", 100, 'black')
+    you_lost = gamebox.from_text(camera.x,camera.y, "GAME OVER", "Arial", 50, 'black')
+    you_lost.top = title.bottom
+    reason_why = gamebox.from_text(camera.x, camera.y, a, "Arial", 30, 'black')
+    reason_why.top = you_lost.bottom
+    intro = gamebox.from_text(camera.x, camera.y, "Press <x> to try again", "Arial", 30, 'black')
+    intro.top = reason_why.bottom
+    merlin_lives = 3
+    life_recovery = 3
+    bread_collected = 0
+    level_counter = 1
+    counter = 0
+    how_long = 30
+    ticks = 0
+    game_over = 0
+    merlin.top = camera.top
+    merlin.left = camera.left
+
+    goblins = [
+        gamebox.from_color(500, 500, 'green', 35, 35),
+        gamebox.from_color(200, 550, 'green', 35, 35),
+        gamebox.from_color(300, 700, 'green', 35, 35),
+        gamebox.from_color(500, 700, 'green', 35, 35),
+        gamebox.from_color(525, 750, 'green', 35, 35),
+        gamebox.from_color(770, 750, 'green', 35, 35),
+        gamebox.from_color(900, 1000, 'green', 35, 35),
+        gamebox.from_color(300, 1000, 'green', 35, 35),
+
+        gamebox.from_color(850, 1100, 'green', 35, 35),
+        gamebox.from_color(500, 1150, 'green', 35, 35),
+        gamebox.from_color(550, 1150, 'green', 35, 35),
+        gamebox.from_color(600, 1150, 'green', 35, 35),
+        gamebox.from_color(650, 1150, 'green', 35, 35),
+        gamebox.from_color(700, 1150, 'green', 35, 35),
+        gamebox.from_color(675, 1150, 'green', 35, 35),
+    ]
+
+    breads = [
+        gamebox.from_image(80, 80, 'bread_piece.png'),
+        gamebox.from_image(100, 100, 'bread_piece.png'),
+        gamebox.from_image(200, 200, 'bread_piece.png'),
+        gamebox.from_image(500, 200, 'bread_piece.png'),
+        gamebox.from_image(700, 120, 'bread_piece.png'),
+        gamebox.from_image(470, 320, 'bread_piece.png'),
+        gamebox.from_image(70, 370, 'bread_piece.png'),
+        gamebox.from_image(730, 250, 'bread_piece.png'),
+        gamebox.from_image(900, 550, 'bread_piece.png'),
+        gamebox.from_image(600, 550, 'bread_piece.png'),
+        gamebox.from_image(400, 550, 'bread_piece.png'),
+        gamebox.from_image(250, 350, 'bread_piece.png'),
+        gamebox.from_image(900, 1120, 'bread_piece.png'),
+        gamebox.from_image(100, 665, 'bread_piece.png'),
+        gamebox.from_image(970, 640, 'bread_piece.png'),
+        gamebox.from_image(175, 910, 'bread_piece.png'),
+        gamebox.from_image(80, 1100, 'bread_piece.png'),
+        gamebox.from_image(220, 850, 'bread_piece.png'),
+        gamebox.from_image(830, 910, 'bread_piece.png'),
+        gamebox.from_image(500, 950, 'bread_piece.png'),
+        ]
+    for bread in breads:
+        bread.scale_by(.03)
+
+    for goblin in goblins:
+        goblin.life = 1
+        goblin.agro = 0
+    shot = gamebox.from_color(1100, 1100, 'yellow', 10, 10)
+    shot.life = 0
+    shot.orientation = 1
+    camera.draw(breadsplash)
+    camera.draw(title)
+    camera.draw(you_lost)
+    camera.draw(intro)
+    camera.draw(reason_why)
+    if pygame.K_x in keys:
+        try_again = True
+        x = False
+    camera.display()
+
+
+
+
+walls = [
+gamebox.from_color(camera.left, 140, "brown", 400, 20),
+    gamebox.from_color(125, 210, "brown", 20, 150),
+    gamebox.from_color(265, 265, "brown", 300, 90),
+    gamebox.from_color(480, 230, "brown", 180, 20),
+    gamebox.from_color(590, 215, "brown", 50, 100),
+    gamebox.from_color(710, 175, "brown", 200, 20),
+    gamebox.from_color(camera.right, 285, "brown", 300, 20),
+    gamebox.from_color(850, 320, "brown", 70, 90),
+    gamebox.from_color(800, 355, "brown", 170, 30),
+    gamebox.from_color(700, 340, "brown", 30, 120),
+    gamebox.from_color(425, 390, "brown", 580, 20),
+    gamebox.from_color(500, 270, "brown", 30, 90),
+    gamebox.from_color(camera.left, 415, "brown", 175, 20),
+    gamebox.from_color(camera.left, 380, "brown", 90, 90),
+    gamebox.from_color(camera.left, 500, "brown", 1500, 20),
+
+
+    gamebox.from_color(100, 770, 'brown', 20, 60),
+    gamebox.from_color(80, 800, 'brown', 610, 20),
+    gamebox.from_color(750, 800, 'brown', 600, 20),
+    gamebox.from_color(375, 770, 'brown', 20, 80),
+    gamebox.from_color(500, 900, 'brown', 600, 20),
+    gamebox.from_color(600, 730, 'brown', 470, 20),
+    gamebox.from_color(600, 1000, 'brown', 760, 20),
+    gamebox.from_color(200, 850, 'brown', 20, 120),
+    gamebox.from_color(20, 1075, 'brown', 400, 30),
+    gamebox.from_color(20, 1010, 'brown', 50, 30),
+    gamebox.from_color(450, 1100, 'brown', 30, 30),
+    gamebox.from_color(350, 1150, 'brown', 30, 50),
+    gamebox.from_color(750, 1150, 'brown', 30, 50),
+
+    # LEVEL 1
+    gamebox.from_color(500, 10, 'grey', 1000, 20),
+    gamebox.from_color(500, 590, 'grey', 1000, 20),
+    gamebox.from_color(10, 300, 'grey', 20, 600),
+    gamebox.from_color(990, 300, 'grey', 20, 600),
+
+    # LEVEL 2
+    gamebox.from_color(10, 900, 'grey', 20, 600),
+    gamebox.from_color(990, 900, 'grey', 20, 600),
+    gamebox.from_color(500, 1170, 'grey', 1000, 20)
+]
+
+enemy_frame = 26
+enemy_frame2 = 18
+
+
+goblins = [
+        gamebox.from_color(500, 500, 'green', 35, 35),
+        gamebox.from_color(200, 550, 'green', 35, 35),
+        gamebox.from_color(300, 700, 'green', 35, 35),
+        gamebox.from_color(500, 700, 'green', 35, 35),
+        gamebox.from_color(525, 750, 'green', 35, 35),
+        gamebox.from_color(770, 750, 'green', 35, 35),
+        gamebox.from_color(900, 1000, 'green', 35, 35),
+        gamebox.from_color(300, 1000, 'green', 35, 35),
+
+        gamebox.from_color(850, 1100, 'green', 35, 35),
+        gamebox.from_color(500, 1150, 'green', 35, 35),
+        gamebox.from_color(550, 1150, 'green', 35, 35),
+        gamebox.from_color(600, 1150, 'green', 35, 35),
+        gamebox.from_color(650, 1150, 'green', 35, 35),
+        gamebox.from_color(700, 1150, 'green', 35, 35),
+        gamebox.from_color(675, 1150, 'green', 35, 35),
+
+]
+
+hearts = [
+    gamebox.from_image(40, 30, 'heart.png'),
+    gamebox.from_image(80, 30, 'heart.png'),
+    gamebox.from_image(120, 30, 'heart.png')
+]
+for heart in hearts:
+    heart.scale_by(.025)
+darkness = [
+    gamebox.from_color(40, 30, 'red', 20, 20),
+    gamebox.from_color(80, 30, 'red', 20, 20),
+    gamebox.from_color(120, 30, 'red', 20, 20),
+]
+
+breads = [
+    #gamebox.from_color(50, 80, 'brown', 10, 10),
+    gamebox.from_image(80, 80, 'bread_piece.png'),
+    gamebox.from_image(100, 100, 'bread_piece.png'),
+    gamebox.from_image(200, 200, 'bread_piece.png'),
+    gamebox.from_image(500,200,'bread_piece.png'),
+    gamebox.from_image(700, 120, 'bread_piece.png'),
+    gamebox.from_image(470, 320, 'bread_piece.png'),
+    gamebox.from_image(70, 370, 'bread_piece.png'),
+    gamebox.from_image(730, 250, 'bread_piece.png'),
+    gamebox.from_image(900, 550, 'bread_piece.png'),
+    gamebox.from_image(600,550,'bread_piece.png'),
+    gamebox.from_image(400,550,'bread_piece.png'),
+    gamebox.from_image(250, 350, 'bread_piece.png'),
+    gamebox.from_image(900, 1120, 'bread_piece.png'),
+    gamebox.from_image(100, 665, 'bread_piece.png'),
+    gamebox.from_image(970, 640, 'bread_piece.png'),
+    gamebox.from_image(175, 910, 'bread_piece.png'),
+    gamebox.from_image(80, 1100, 'bread_piece.png'),
+    gamebox.from_image(220, 850, 'bread_piece.png'),
+    gamebox.from_image(830, 910, 'bread_piece.png'),
+    gamebox.from_image(500, 950, 'bread_piece.png'),
+
+]
+
+for bread in breads:
+    bread.scale_by(.03)
+
+portal1 = [
+    gamebox.from_color(55, 570, "green", 70, 20)
+]
+
+portal2 = [
+    gamebox.from_color(55, 1150, "green", 70, 20)
+]
+
+music = gamebox.load_sound("scifi002.wav")
+music_end = gamebox.load_sound("you_win.wav")
+for goblin in goblins:
+    goblin.life = 1
+    goblin.agro = 0
+shot = gamebox.from_color(1100, 1100, 'yellow', 10, 10)
+shot.life = 0
+shot.orientation = 1
+x = True
+try_again = True
+
+def tick(keys):
+    global game_over, a, x, merlin_lives, life_recovery,try_again,end_music, ticks, how_long, hearts, breads, bread_collected, level_counter, enemy_frame, enemy_frame2, counter
+    if x:
+
+        if show_splash:
+            splash(keys)
+            return
+        camera.clear('black')
+        if not try_again:
+            again(keys)
+            return
+
+
+        if pygame.K_RIGHT in keys:
+            merlin.x += 10
+            shot.orientation = 1
+        # moves box 10 pixels to the right using right arrow key
+        if pygame.K_LEFT in keys:
+            merlin.x -= 10
+            shot.orientation = -1
+        if pygame.K_UP in keys:
+            merlin.y -= 10
+
+        life_recovery += .1
+
+        for wall in walls:
+            camera.draw(wall)
+            merlin.move_to_stop_overlapping(wall)
+
+            if shot.touches(wall):
+                shot.x = 1200
+                shot.y = 1200
+                shot.speedx = 0
+                shot.speedy = 0
+
+
+
+        merlin.speedx *= .9
+        merlin.speedy *= .9
+        merlin.speedy += 1.25
+
+        merlin.move_speed()
+
+
+        for wall in walls:
+            merlin.move_to_stop_overlapping(wall)
+            for goblin in goblins:
+                goblin.move_to_stop_overlapping(wall)
+                goblin.speedy += 0.1
+            camera.draw(wall)
+        if pygame.K_SPACE in keys and shot.life > 30:
+            shot.center = merlin.center
+            musicplayer0 = music.play()
+            if shot.orientation == -1:
+                shot.speedx = -20
+            elif shot.orientation == 1:
+                shot.speedx = 20
+            else:
+                shot.speedx = 20
+            shot.life = 0
+        shot.move_speed()
+        shot.life += 1
+        camera.draw(shot)
+        for goblin in goblins:
+
+            if merlin.touches(goblin,-1,-15) and life_recovery >= 3:
+                merlin_lives -= 1
+                life_recovery = 0
+            if shot.touches(goblin):
+                goblin.life -= 1
+                shot.x = 1200
+                shot.y = 1200
+                shot.speedx = 0
+                shot.speedy = 0
+
+            if goblin.life == 0:
+                goblin.x = 1100
+                goblin.y = 1100
+                goblin.speedx = 0
+                goblin.speedy = 0
+
+            else:
+                # goblin's movement
+                if (merlin.y - 30) <= goblin.y <= (merlin.y + 30) and (merlin.x - 400) <= goblin.x <= (merlin.x + 400):
+                    goblin.agro = 1
+                    if merlin.x < goblin.x:
+                        goblin.speedx -= 1
+                        goblin.image = baddies[enemy_frame2]
+                        if counter % 3 == 0:
+                            enemy_frame2 -= 1
+                        if enemy_frame2 == 10:
+                            enemy_frame2 = 18
+                    if merlin.x > goblin.x:
+                        goblin.speedx += 1
+                        goblin.image = baddies[enemy_frame]
+                        if counter % 3 == 0:
+                            enemy_frame += 1
+                        if enemy_frame == 36:
+                            enemy_frame = 26
+
+
+                else:
+                   goblin.image = baddies[enemy_frame]
+                goblin.speedx *= .8
+                goblin.speedy *= .8
+                goblin.move_speed()
+                camera.draw(goblin)
+    for heart in hearts[0:merlin_lives]:
+        heart.top = camera.top + 20
+        camera.draw(heart)
+
+    if level_counter == 1:
+        for portal in portal1:
+            level_name = gamebox.from_text(camera.x, camera.y,"Level 1", "Arial", 20, "white", bold= True)
+            level_name.top = camera.top+20
+            camera.draw(level_name)
+            camera.draw(portal)
+            if (merlin.touches(portal) or pygame.K_q in keys) and level_counter == 1:
+                game_over = gamebox.from_text(camera.x, camera.y, "Level 1 Complete", "Comic Sans", 150, "white")
+                game_over2 = gamebox.from_text(500, 400, "Press <SPACE> to Continue", "Comic Sans", 100, "white")
+                camera.draw(game_over)
+                camera.draw(game_over2)
+                x = False
+
+    elif level_counter == 2:
+        for portal in portal2:
+            level_name2 = gamebox.from_text(camera.x, camera.y, "Level 2", "Arial", 20, "white", bold=True)
+            level_name2.top = camera.top + 20
+            camera.draw(level_name2)
+            camera.draw(portal)
+            if (merlin.touches(portal) or pygame.K_l in keys) and level_counter == 2:
+                if bread_collected >= 20:
+                    game_over = gamebox.from_text(camera.x, camera.y, "You Win!", "Comic Sans", 150, "white")
+                    camera.draw(game_over)
+                    if end_music:
+                        musicplayer_end = music_end.play()
+                        end_music = False
+
+                    x = False
+                else:
+                    a = "You did not collect enough bread!"
+                    try_again = False
+
+    if (pygame.K_SPACE in keys and x == False) and level_counter < 2:
+        x = True
+        level_counter += 1
+        camera.move(0, 580)
+        merlin.move(10, 70)
+
+
+    if x:
+        ticks += 1
+    elif x == False:
+        ticks += 0
+        ticks = 0
+    time_name = gamebox.from_text(camera.x, camera.y, str("Time Remaining:"), "Arial", 20, "white")
+
+    time = gamebox.from_text(camera.x, camera.y, str(how_long - (ticks // 30)), 'Arial', 20, 'white')
+    time_name.top = camera.top + 20
+    time_name.right = camera.right - 40
+    time.top = camera.top + 20
+    time.right = camera.right - 20
+    time.right = camera.right - 20
+    camera.draw(time_name)
+    camera.draw(time)
+
+    if (how_long - (ticks // 30)) == 0:
+        a  = "You ran out of time!"
+        try_again = False
+    if merlin_lives == 0:
+
+        a = "You ran out of lives!"
+        try_again = False
+    for bread in breads:
+        camera.draw(bread)
+        if merlin.touches(bread):
+            bread.x = 2000
+            bread.y = 0
+            bread_collected += 1
+
+    bread_score = gamebox.from_text(225, 0, "Bread Collected: " + str(bread_collected), 'Arial', 20, 'white')
+    bread_score.top = camera.top + 20
+    camera.draw(bread_score)
+    camera.draw(merlin)
+    camera.display()
+    counter +=1
+
+ticks_per_second = 30
+gamebox.timer_loop(ticks_per_second, tick)
